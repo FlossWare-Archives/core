@@ -46,16 +46,49 @@ public class StringUtil {
     }
 
     /**
-     * Return true if a separator can be appended or false if not. To append,
-     * the index must be less than or equal to the array's length - 2.
+     * Return true if a separator can be appended or false if not. To append, the index must be less than or equal to
+     * the array's length - 2.
      *
      * @param index the place within the array we are processing.
      * @param objs  the array of objects being processed.
      *
      * @return true if we can append a separator or false if not.
      */
-    private static boolean isSeparatorAppendable(final int index, final Object... objs) {
-        return index <= objs.length - 2;
+    static boolean isSeparatorAppendable(final int index, final Object... objs) {
+        return index <= (objs.length - 2);
+    }
+
+    /**
+     * Concat objects together and return the toString of the concatenation.
+     *
+     * @param isSeparatorAtEnd if true denotes we will always have the separator appended.
+     * @param separator        the separator to use between concatenation.
+     * @param objs             the objects to concatenate.
+     *
+     * @return the string representation of the concatenation.
+     */
+    public static String concatWithSeparator(final boolean isSeparatorAtEnd, final String separator, Object... objs) {
+        IntegrityUtil.ensure(objs, "Must have a list of objects to concat!");
+
+        if (objs.length < 2 && !isSeparatorAtEnd) {
+            return objs[0].toString();
+        }
+
+        final StringBuilder sb = new StringBuilder();
+
+        for (int index = 0; index < objs.length; index++) {
+            sb.append(objs[index]);
+
+            if (isSeparatorAppendable(index, objs)) {
+                sb.append(separator);
+            }
+        }
+
+        if (isSeparatorAtEnd) {
+            sb.append(separator);
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -67,19 +100,7 @@ public class StringUtil {
      * @return the string representation of the concatenation.
      */
     public static String concatWithSeparator(final String separator, Object... objs) {
-        IntegrityUtil.ensure(objs, "Must have a list of objects to concat!");
-
-        final StringBuilder sb = new StringBuilder();
-
-        for (int index = 0; index < objs.length; index++) {
-            sb.append(objs[index]);
-
-            if (isSeparatorAppendable(index, objs.length)) {
-                sb.append(separator);
-            }
-        }
-
-        return sb.toString();
+        return concatWithSeparator(false, separator, objs);
     }
 
     /**
