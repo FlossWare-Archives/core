@@ -53,6 +53,7 @@
         <module>collections</module>
 		<module>utils</module>
         <module>reflect</module>
+		<module>xml</module>
 		<module>wsutils</module>
 	</modules>
 
