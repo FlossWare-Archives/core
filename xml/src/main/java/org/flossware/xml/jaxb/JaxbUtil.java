@@ -33,6 +33,14 @@ public class JaxbUtil<O> {
 
     private final JAXBContext jaxbContext;
 
+    private O getObjectFactory() {
+        return objectFactory;
+    }
+
+    private JAXBContext getJaxbContext() {
+        return jaxbContext;
+    }
+
     public JaxbUtil(final O objectFactory) throws JAXBException {
         this.objectFactory = IntegrityUtil.ensure(objectFactory, "Must have an object factory!");
         this.jaxbContext = JAXBContext.newInstance(objectFactory.getClass().getPackage().getName(), objectFactory.getClass().getClassLoader());
