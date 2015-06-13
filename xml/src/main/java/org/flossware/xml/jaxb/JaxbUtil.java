@@ -16,9 +16,15 @@
  */
 package org.flossware.xml.jaxb;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import org.flossware.common.IntegrityUtil;
+import org.flossware.util.MapUtil;
 
 /**
  * Utility class for Jaxb related work.
@@ -32,6 +38,8 @@ public class JaxbUtil<O> {
     private final O objectFactory;
 
     private final JAXBContext jaxbContext;
+    
+    private final Map properties;
 
     private O getObjectFactory() {
         return objectFactory;
@@ -40,9 +48,22 @@ public class JaxbUtil<O> {
     private JAXBContext getJaxbContext() {
         return jaxbContext;
     }
+    
+    private Map getProperties() {
+        return properties;
+    }
 
-    public JaxbUtil(final O objectFactory) throws JAXBException {
+    public JaxbUtil(final O objectFactory, final Map properties) throws JAXBException {
         this.objectFactory = IntegrityUtil.ensure(objectFactory, "Must have an object factory!");
         this.jaxbContext = JAXBContext.newInstance(objectFactory.getClass().getPackage().getName(), objectFactory.getClass().getClassLoader());
+        this.properties = properties;
+    }
+    
+    public JaxbUtil(final O objectFactory, final boolean isFormatted) throws JAXBException {
+        this(objectFactory, MapUtil.put(Marshaller.JAXB_FORMATTED_OUTPUT, true));
+    }
+    
+    public JaxbUtil(final O objectFactory) throws JAXBException {
+        this(objectFactory, Collections.EMPTY_MAP);
     }
 }
