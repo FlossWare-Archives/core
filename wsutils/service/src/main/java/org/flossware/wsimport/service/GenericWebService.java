@@ -63,7 +63,7 @@ public class GenericWebService<P> extends Service implements WebService<P> {
         super(IntegrityUtil.ensure(wsdlLocation, "Cannot have a null WSDL URL"), WebServiceUtil.getQName(serviceClass));
 
         this.qname = WebServiceUtil.getQName(serviceClass);
-        this.portName = WebServiceUtil.getWebServiceClientAnnotation(serviceClass).name();
+        this.portName = WebServiceUtil.getWebEndpointAnnotation(serviceClass).name();
         this.portClass = WebServiceUtil.getPortClass(serviceClass);
     }
 
