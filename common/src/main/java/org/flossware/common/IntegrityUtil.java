@@ -192,7 +192,7 @@ public class IntegrityUtil {
      *
      * @throws IllegalArgumentException if <code>map</code> is empty or null.
      */
-    public static Map<?, ?> ensure(final Map<?, ?> map, final int minSize, final String errorMsg) throws IllegalArgumentException {
+    public static <K, V> Map<K, V> ensure(final Map<K, V> map, final int minSize, final String errorMsg) throws IllegalArgumentException {
         IntegrityUtil.ensure((Object) map, errorMsg);
 
         if (map.size() < minSize) {
@@ -214,7 +214,7 @@ public class IntegrityUtil {
      *
      * @throws IllegalArgumentException if <code>map</code> is empty or null.
      */
-    public static Map<?, ?> ensure(final Map<?, ?> map, final String errorMsg) throws IllegalArgumentException {
+    public static <K, V> Map<K, V> ensure(final Map<K, V> map, final String errorMsg) throws IllegalArgumentException {
         return IntegrityUtil.ensure(map, DEFAULT_MIN_MAP_SIZE, errorMsg);
     }
 
@@ -228,7 +228,7 @@ public class IntegrityUtil {
      *
      * @throws IllegalArgumentException if <code>map</code> is empty or null.
      */
-    public static Map<?, ?> ensure(final Map<?, ?> map, final int minSize) throws IllegalArgumentException {
+    public static <K, V> Map<K, V> ensure(final Map<K, V> map, final int minSize) throws IllegalArgumentException {
         return IntegrityUtil.ensure(map, minSize, DEFAULT_ERROR_MSG);
     }
 
@@ -241,7 +241,7 @@ public class IntegrityUtil {
      *
      * @throws IllegalArgumentException if <code>map</code> is empty or null.
      */
-    public static Map<?, ?> ensure(final Map<?, ?> map) throws IllegalArgumentException {
+    public static <K, V> Map<K, V> ensure(final Map<K, V> map) throws IllegalArgumentException {
         return IntegrityUtil.ensure(map, DEFAULT_MIN_MAP_SIZE);
     }
 
