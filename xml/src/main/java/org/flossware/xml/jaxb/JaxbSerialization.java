@@ -43,24 +43,47 @@ public class JaxbSerialization {
      */
     private final JAXBContext jaxbContext;
 
+    /**
+     * Creates and stores a JAXBContext.
+     *
+     * @param objectFactoryClass the class of the object factory generated with xjc.
+     * @param properties the properties to set on the JAXBContext created.
+     *
+     * @throws JAXBException if any problems arise creating the JAXBContext.
+     */
     public JaxbSerialization(final Class objectFactoryClass, final Map properties) throws JAXBException {
         this.jaxbContext = JaxbUtil.createJaxbContext(objectFactoryClass, properties);
     }
 
+    /**
+     * Creates and stores a JAXBContext.
+     *
+     * @param objectFactoryClass the class of the object factory generated with xjc.
+     *
+     * @throws JAXBException if any problems arise creating the JAXBContext.
+     */
     public JaxbSerialization(final Class objectFactoryClass) throws JAXBException {
         this.jaxbContext = JaxbUtil.createJaxbContext(objectFactoryClass);
     }
 
+    /**
+     * Return the JAXBContext we created at construct time.
+     *
+     * @return the JAXBContext we created at construct time.
+     */
     public JAXBContext getJaxbContext() {
         return jaxbContext;
     }
 
+    /**
+     * Create an unmarshaller from the internal JAXBContext (created at construct time).
+     *
+     * @return an unmarshaller from the internal JAXBContext (created at construct time).
+     *
+     * @throws JAXBException if any problems arise creating the Unmarshaller.
+     */
     public Unmarshaller createUnmarshaller() throws JAXBException {
         return getJaxbContext().createUnmarshaller();
-    }
-
-    public Marshaller createMarshaller() throws JAXBException {
-        return getJaxbContext().createMarshaller();
     }
 
     /**
@@ -71,7 +94,7 @@ public class JaxbSerialization {
     }
 
     /**
-     * Unmarshal from a file.
+     * Unmarshal from a file as a specific type.
      */
     public <T> T unmarshal(final File file, final Class<T> type) throws JAXBException {
         return unmarshal(new StreamSource(file), type);
@@ -85,7 +108,7 @@ public class JaxbSerialization {
     }
 
     /**
-     * Unmarshal from an input stream.
+     * Unmarshal from an input stream as a specific type.
      */
     public <T> T unmarshal(final InputStream inputStream, final Class<T> type) throws JAXBException {
         return unmarshal(new StreamSource(inputStream), type);
@@ -99,7 +122,7 @@ public class JaxbSerialization {
     }
 
     /**
-     * Unmarshal from a reader.
+     * Unmarshal from a reader as a specific type.
      */
     public <T> T unmarshal(final Reader reader, final Class<T> type) throws JAXBException {
         return unmarshal(new StreamSource(reader), type);
@@ -113,51 +136,118 @@ public class JaxbSerialization {
     }
 
     /**
-     * Unmarshal from a source.
+     * Unmarshal from a source as a specific type.
      */
     public <T> T unmarshal(final Source source, final Class<T> type) throws JAXBException {
         return createUnmarshaller().unmarshal(source, type).getValue();
     }
 
     /**
-     * Marshal to a file.
+     * Create an marshaller from the internal JAXBContext (created at construct time). If isFormatted is true, marshalling will
+     * format the XML.
+     *
+     * @param isFormatted is a flag if true will format XML upon serialization.
+     *
+     * @return a marshaller from the internal JAXBContext (created at construct time).
+     *
+     * @throws JAXBException if any problems arise creating the Unmarshaller.
+     */
+    public Marshaller createMarshaller(boolean isFormatted) throws JAXBException {
+        return JaxbUtil.setProperty(getJaxbContext().createMarshaller(), Marshaller.JAXB_FORMATTED_OUTPUT, isFormatted);
+    }
+
+    /**
+     * Create a marshaller from the internal JAXBContext (created at construct time). Marshalling will for formatted XML.
+     *
+     * @return a marshaller who will format XML.
+     *
+     * @throws JAXBException if any problems arise creating the marshaller.
+     */
+    public Marshaller createMarshaller() throws JAXBException {
+        return createMarshaller(true);
+    }
+
+    /**
+     * Marshal to a file. If isFormatted is true, the XML will be marshalled formatted.
+     */
+    public void marshal(final JAXBElement element, final File file, final boolean isFormatted) throws JAXBException {
+        createMarshaller(isFormatted).marshal(element, file);
+    }
+
+    /**
+     * Marshal to a file in formatted XML.
      */
     public void marshal(final JAXBElement element, final File file) throws JAXBException {
-        createMarshaller().marshal(element, file);
+        marshal(element, file, true);
     }
 
     /**
-     * Marshal to an output stream.
+     * Marshal to an output stream. If isFormatted is true, the XML will be marshalled formatted.
+     */
+    public void marshal(final JAXBElement element, final OutputStream outputStream, final boolean isFormatted) throws JAXBException {
+        createMarshaller(isFormatted).marshal(element, outputStream);
+    }
+
+    /**
+     * Marshal to an output stream in formatted XML.
      */
     public void marshal(final JAXBElement element, final OutputStream outputStream) throws JAXBException {
-        createMarshaller().marshal(element, outputStream);
+        marshal(element, outputStream, true);
     }
 
     /**
-     * Marshal to a writer.
+     * Marshal to a writer. If isFormatted is true, the XML will be marshalled formatted.
+     */
+    public void marshal(final JAXBElement element, final Writer writer, final boolean isFormatted) throws JAXBException {
+        createMarshaller(isFormatted).marshal(element, writer);
+    }
+
+    /**
+     * Marshal to a writer in formatted XML.
      */
     public void marshal(final JAXBElement element, final Writer writer) throws JAXBException {
-        createMarshaller().marshal(element, writer);
+        marshal(element, writer, true);
     }
 
     /**
-     * Marshal to a file. Use the ObjectFactory if it has a create method to generate a JAXBElement.
+     * Marshal to a file. If isFormatted is true, the XML will be marshalled formatted.
+     */
+    public void marshal(final Object object, final File file, final boolean isFormatted) throws JAXBException {
+        createMarshaller(isFormatted).marshal(object, file);
+    }
+
+    /**
+     * Marshal to a file in formatted XML.
      */
     public void marshal(final Object object, final File file) throws JAXBException {
-        createMarshaller().marshal(object, file);
+        marshal(object, file, true);
     }
 
     /**
-     * Marshal to an output stream. Use the ObjectFactory if it has a create method to generate a JAXBElement.
+     * Marshal to an output stream. If isFormatted is true, the XML will be marshalled formatted.
+     */
+    public void marshal(final Object object, final OutputStream outputStream, final boolean isFormatted) throws JAXBException {
+        createMarshaller(isFormatted).marshal(object, outputStream);
+    }
+
+    /**
+     * Marshal to an output stream in formatted XML.
      */
     public void marshal(final Object object, final OutputStream outputStream) throws JAXBException {
-        createMarshaller().marshal(object, outputStream);
+        marshal(object, outputStream, true);
     }
 
     /**
-     * Marshal to a writer. Use the ObjectFactory if it has a create method to generate a JAXBElement.
+     * Marshal to a writer in formatted XML. If isFormatted is true, the XML will be marshalled formatted.
+     */
+    public void marshal(final Object object, final Writer writer, final boolean isFormatted) throws JAXBException {
+        createMarshaller(isFormatted).marshal(object, writer);
+    }
+
+    /**
+     * Marshal to a writer in formatted XML.
      */
     public void marshal(final Object object, final Writer writer) throws JAXBException {
-        createMarshaller().marshal(object, writer);
+        marshal(object, writer, true);
     }
 }

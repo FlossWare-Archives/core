@@ -20,6 +20,8 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import org.flossware.common.IntegrityUtil;
 import org.flossware.util.ObjectUtil;
 
@@ -36,7 +38,7 @@ public class JaxbUtil {
      * @param objectFactoryClass the object factory class generated via xjc.
      * @param properties provider-specific properties.
      *
-     * @return a JAXBContext
+     * @return a JAXBContext.
      *
      * @throws JAXBException if any problems arise create the context.
      */
@@ -45,14 +47,14 @@ public class JaxbUtil {
     }
 
     /**
-     * Create a JAXB Context.
+     * Create a new JAXB context.
      *
-     * @param <T>
-     * @param objectFactoryClass
+     * @param <T> the type of object factory.
+     * @param objectFactoryClass the object factory generated via xjc.
      *
-     * @return
+     * @return a JAXBContext.
      *
-     * @throws JAXBException
+     * @throws JAXBException if any problems arise create the context.
      */
     public static <T> JAXBContext createJaxbContext(final Class<T> objectFactoryClass) throws JAXBException {
         return JAXBContext.newInstance(ObjectUtil.getPackage(objectFactoryClass), objectFactoryClass.getClassLoader());
@@ -110,5 +112,22 @@ public class JaxbUtil {
         }
 
         return (T) obj;
+    }
+
+    /**
+     * Set a property value on marshaller and return the marshaller.
+     *
+     * @param marshaller the marshaller to set a value upon.
+     * @param property the property to set.
+     * @param value the value of property.
+     *
+     * @return the marshaller.
+     *
+     * @throws PropertyException if property is invalid.
+     */
+    public static Marshaller setProperty(final Marshaller marshaller, final String property, final Object value) throws PropertyException {
+        IntegrityUtil.ensure(marshaller, "Marshaller cannot be null!").setProperty(property, value);
+
+        return marshaller;
     }
 }

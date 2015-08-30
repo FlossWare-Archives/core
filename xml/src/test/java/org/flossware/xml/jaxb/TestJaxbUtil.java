@@ -17,8 +17,10 @@
 package org.flossware.xml.jaxb;
 
 import java.util.Collections;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import org.flossware.core.xml.ObjectFactory;
 import org.junit.Assert;
@@ -54,7 +56,7 @@ public class TestJaxbUtil {
 
     @Test
     public void test_createJaxbContext_Class() throws JAXBException {
-        JaxbUtil.createJaxbContext(ObjectFactory.class);
+        Assert.assertNotNull("Should have instantiated a JAXBContext", JaxbUtil.createJaxbContext(ObjectFactory.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -96,5 +98,22 @@ public class TestJaxbUtil {
         final Object object = new JAXBElement(TEST_QNAME, STUB_CLASS, stubClass);
 
         Assert.assertSame("Should be the same value", stubClass, JaxbUtil.computeValue(object));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_setProperty_null() throws JAXBException {
+        JaxbUtil.setProperty(null, Marshaller.JAXB_FORMATTED_OUTPUT, true);
+    }
+
+    @Test
+    public void test_setProperty() throws JAXBException {
+        final JAXBContext jaxbContext = JaxbUtil.createJaxbContext(ObjectFactory.class);
+        final Marshaller marshaller = jaxbContext.createMarshaller();
+
+        final Marshaller compareMarshaller = JaxbUtil.setProperty(marshaller, Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        Assert.assertSame("Should be the same marshaller", marshaller, compareMarshaller);
+        Assert.assertEquals("Property should be set", Boolean.TRUE, compareMarshaller.getProperty(Marshaller.JAXB_FORMATTED_OUTPUT));
+        Assert.assertNull("Property should not be set", compareMarshaller.getProperty(Marshaller.JAXB_SCHEMA_LOCATION));
     }
 }
