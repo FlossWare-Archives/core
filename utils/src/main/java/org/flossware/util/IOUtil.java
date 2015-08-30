@@ -31,7 +31,7 @@ public class IOUtil {
     /**
      * Our logger.
      */
-    private static final Logger logger = Logger.getLogger(FileUtil.class.getName());
+    private static final Logger logger = Logger.getLogger(IOUtil.class.getName());
 
     /**
      * Default constructor not allowed.
@@ -47,8 +47,7 @@ public class IOUtil {
     }
 
     /**
-     * Attempts to close a closeable. If any trouble arises closing, an error is
-     * logged.
+     * Attempts to close a closeable. If any trouble arises closing, an error is logged.
      *
      * @param closeable the thing to close.
      */
@@ -65,14 +64,13 @@ public class IOUtil {
     }
 
     /**
-     * Attempts to close inputStream. If any trouble arise closing, no error is
-     * logged.
+     * Attempts to close inputStream. If any trouble arise closing, no error is logged.
      *
      * @param closeable the thing to close.
      *
      * @throws IllegalArgumentException if inputStream is null.
      */
-    public static void closeQuieryly(final Closeable closeable) {
+    public static void closeQuietly(final Closeable closeable) {
         if (null == closeable) {
             return;
         }

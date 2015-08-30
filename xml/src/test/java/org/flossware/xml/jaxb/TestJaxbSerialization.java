@@ -17,6 +17,7 @@
 package org.flossware.xml.jaxb;
 
 /**
+ * Tests the JaxbSerialization class.
  *
  * @author sfloess
  */

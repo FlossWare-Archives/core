@@ -20,6 +20,8 @@ import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import org.flossware.common.IntegrityUtil;
+import org.flossware.util.ObjectUtil;
 
 /**
  * Utility class for Jaxb related work.
@@ -39,43 +41,33 @@ public class JaxbUtil {
      * @throws JAXBException if any problems arise create the context.
      */
     public static JAXBContext createJaxbContext(final Class objectFactoryClass, final Map properties) throws JAXBException {
-        return JAXBContext.newInstance(objectFactoryClass.getPackage().getName(), objectFactoryClass.getClassLoader(), properties);
-    }
-
-    /**
-     * Create a JXB Context.
-     *
-     * @param objectFactory the object factory class generated via xjc.
-     * @param properties provider-specific properties.
-     *
-     * @return a JAXBContext
-     *
-     * @throws JAXBException if any problems arise create the context.
-     */
-    public static JAXBContext createJaxbContext(final Object objectFactory, final Map properties) throws JAXBException {
-        return createJaxbContext(objectFactory.getClass(), properties);
+        return JAXBContext.newInstance(ObjectUtil.getPackage(objectFactoryClass), objectFactoryClass.getClassLoader(), properties);
     }
 
     /**
      * Create a JAXB Context.
      *
      * @param <T>
-     * @param klass
+     * @param objectFactoryClass
      *
      * @return
      *
      * @throws JAXBException
      */
-    public static <T> JAXBContext createJaxbContext(final Class<T> klass) throws JAXBException {
-        return JAXBContext.newInstance(klass);
+    public static <T> JAXBContext createJaxbContext(final Class<T> objectFactoryClass) throws JAXBException {
+        return JAXBContext.newInstance(ObjectUtil.getPackage(objectFactoryClass), objectFactoryClass.getClassLoader());
     }
 
-    public static JAXBContext createJaxbContext(final Object objectFactory) throws JAXBException {
-        return createJaxbContext(objectFactory.getClass());
-    }
-
-    public static <T> JAXBContext createJaxbContext(final JAXBElement<T> element) throws JAXBException {
-        return createJaxbContext(element.getDeclaredType());
+    /**
+     * Return the element's declared type class.
+     *
+     * @param <T> the type of the class for the element's declared type.
+     * @param element the JAXB element.
+     *
+     * @return the class for the element's declared type.
+     */
+    public static <T> Class<T> getDeclaredTypeClass(final JAXBElement<T> element) {
+        return IntegrityUtil.ensure(element, "Must have a JAXB element!").getDeclaredType();
     }
 
     /**
@@ -85,7 +77,7 @@ public class JaxbUtil {
      *
      * @return true if a JAXBElement or false if not.
      */
-    static boolean isJaxbElement(final Object obj) {
+    public static boolean isJaxbElement(final Object obj) {
         return null != obj && obj instanceof JAXBElement;
     }
 
@@ -99,7 +91,7 @@ public class JaxbUtil {
      * @return the type cast JAXBElement's value.
      */
     public static <T> T computeValue(final JAXBElement jaxbElement) {
-        return (T) jaxbElement.getValue();
+        return (T) IntegrityUtil.ensure(jaxbElement, "JAXBElement cannot be null!").getValue();
     }
 
     /**

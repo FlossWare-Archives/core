@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -29,44 +29,26 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import org.flossware.collections.map.DefaultFunctionalMap;
-import org.flossware.collections.map.FunctionalMap;
-import org.flossware.common.IntegrityUtil;
 
 /**
- * Serialization for XML.
- *
- * @param <O> the object factory type.
+ * Serialization for XML. This is a utility class so you don't have to instantiate a JAXBContext when marshalling/unmarshalling and
+ * also provides casting when unmarshalling.
  *
  * @author Scot P. Floess
  */
-public class JaxbSerialization<O> {
-
-    /**
-     * The object factory generated from JAXb
-     */
-    private final O objectFactory;
+public class JaxbSerialization {
 
     /**
      * The context based upon the object factory.
      */
     private final JAXBContext jaxbContext;
 
-    private O getObjectFactory() {
-        return objectFactory;
+    public JaxbSerialization(final Class objectFactoryClass, final Map properties) throws JAXBException {
+        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactoryClass, properties);
     }
 
-    public JaxbSerialization(final O objectFactory, final FunctionalMap properties) throws JAXBException {
-        this.objectFactory = IntegrityUtil.ensure(objectFactory, "Must have an object factory!");
-        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactory, properties);
-    }
-
-    public JaxbSerialization(final O objectFactory, final boolean isFormatted) throws JAXBException {
-        this(objectFactory, new DefaultFunctionalMap(new HashMap()).putF(Marshaller.JAXB_FORMATTED_OUTPUT, true));
-    }
-
-    public JaxbSerialization(final O objectFactory) throws JAXBException {
-        this(objectFactory, new DefaultFunctionalMap(new HashMap()));
+    public JaxbSerialization(final Class objectFactoryClass) throws JAXBException {
+        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactoryClass);
     }
 
     public JAXBContext getJaxbContext() {
