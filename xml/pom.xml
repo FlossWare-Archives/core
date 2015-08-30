@@ -27,6 +27,26 @@
 		</developer>
 	</developers>
 
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaDirectory>src/test/resources</schemaDirectory>
+                    <generatePackage>org.flossware.core.xml</generatePackage>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>

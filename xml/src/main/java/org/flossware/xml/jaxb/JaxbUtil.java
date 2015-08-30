@@ -28,20 +28,54 @@ import javax.xml.bind.JAXBException;
  */
 public class JaxbUtil {
 
+    /**
+     * Create a new JAXB context.
+     *
+     * @param objectFactoryClass the object factory class generated via xjc.
+     * @param properties provider-specific properties.
+     *
+     * @return a JAXBContext
+     *
+     * @throws JAXBException if any problems arise create the context.
+     */
+    public static JAXBContext createJaxbContext(final Class objectFactoryClass, final Map properties) throws JAXBException {
+        return JAXBContext.newInstance(objectFactoryClass.getPackage().getName(), objectFactoryClass.getClassLoader(), properties);
+    }
+
+    /**
+     * Create a JXB Context.
+     *
+     * @param objectFactory the object factory class generated via xjc.
+     * @param properties provider-specific properties.
+     *
+     * @return a JAXBContext
+     *
+     * @throws JAXBException if any problems arise create the context.
+     */
     public static JAXBContext createJaxbContext(final Object objectFactory, final Map properties) throws JAXBException {
-        return JAXBContext.newInstance(objectFactory.getClass().getPackage().getName(), objectFactory.getClass().getClassLoader(), properties);
+        return createJaxbContext(objectFactory.getClass(), properties);
     }
 
-    public static JAXBContext createJaxbContext(final Object objectFactory) throws JAXBException {
-        return JAXBContext.newInstance(objectFactory.getClass().getPackage().getName(), objectFactory.getClass().getClassLoader());
-    }
-
-    public static <T> JAXBContext createContext(final Class<T> klass) throws JAXBException {
+    /**
+     * Create a JAXB Context.
+     *
+     * @param <T>
+     * @param klass
+     *
+     * @return
+     *
+     * @throws JAXBException
+     */
+    public static <T> JAXBContext createJaxbContext(final Class<T> klass) throws JAXBException {
         return JAXBContext.newInstance(klass);
     }
 
-    public static <T> JAXBContext createContext(final JAXBElement<T> element) throws JAXBException {
-        return createContext(element.getDeclaredType());
+    public static JAXBContext createJaxbContext(final Object objectFactory) throws JAXBException {
+        return createJaxbContext(objectFactory.getClass());
+    }
+
+    public static <T> JAXBContext createJaxbContext(final JAXBElement<T> element) throws JAXBException {
+        return createJaxbContext(element.getDeclaredType());
     }
 
     /**

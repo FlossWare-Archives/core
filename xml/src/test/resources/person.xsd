@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xsd:schema elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://org.flossware/core/xml" xmlns:tns="http://org.flossware/core/xml">
+
+	<!-- ================================================================================================= -->
+    
+	<xsd:complexType name="BaseType" abstract="true">
+		<xsd:annotation>
+            <xsd:documentation>
+                The base type.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Id" type="xsd:long" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+                        The object id.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<!-- ================================================================================================= -->
+
+	<xsd:complexType name="NameType">
+		<xsd:annotation>
+			<xsd:documentation>A name representation.</xsd:documentation>
+		</xsd:annotation>
+
+		<xsd:sequence>
+			<xsd:element name="First" type="xsd:string" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The first name.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+
+			<xsd:element name="Last" type="xsd:string" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The last name.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PersonType">
+		<xsd:annotation>
+			<xsd:documentation>A person representation.</xsd:documentation>
+		</xsd:annotation>
+
+		<xsd:complexContent>
+			<xsd:extension base="tns:BaseType">
+                <xsd:sequence>
+                    <xsd:element name="Name" type="tns:NameType" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The name of a person
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+
+                    <xsd:element name="Age" type="xsd:int" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The age of a person
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+	</xsd:complexType>
+
+	<!-- ================================================================================================= -->
+
+    <xsd:element name="Name" type="tns:NameType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An instance of a name.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="Person" type="tns:PersonType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An instance of a person.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+	<!-- ================================================================================================= -->
+
+</xsd:schema>
