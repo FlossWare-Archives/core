@@ -90,7 +90,8 @@ public class TestJaxbSerialization {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         final JaxbSerialization jaxbSerialization = new JaxbSerialization(ObjectFactory.class);
-        jaxbSerialization.marshal(person, baos);
+        final ObjectFactory factory = new ObjectFactory();
+        jaxbSerialization.marshal(factory.createPerson(person), baos);
 
         final byte[] marshalledPerson = baos.toByteArray();
         Assert.assertNotEquals("Should have data", 0, marshalledPerson.length);
