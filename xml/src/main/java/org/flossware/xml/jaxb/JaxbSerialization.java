@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -29,6 +30,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import org.flossware.common.IntegrityUtil;
 
 /**
  * Serialization for XML. This is a utility class so you don't have to instantiate a JAXBContext when marshalling/unmarshalling and
@@ -39,9 +41,46 @@ import javax.xml.transform.stream.StreamSource;
 public class JaxbSerialization {
 
     /**
+     * The object factory.
+     */
+    private final Object objectFactory;
+
+    /**
      * The context based upon the object factory.
      */
     private final JAXBContext jaxbContext;
+
+    /**
+     * A map to hold all factory methods for marshalling.
+     */
+    private final Map<Class, Method> jaxbFactoryMap;
+
+    /**
+     * Creates and stores a JAXBContext.
+     *
+     * @param objectFactory the object factory generated with xjc.
+     * @param properties the properties to set on the JAXBContext created.
+     *
+     * @throws JAXBException if any problems arise creating the JAXBContext.
+     */
+    public JaxbSerialization(final Object objectFactory, final Map properties) throws JAXBException {
+        this.objectFactory = IntegrityUtil.ensure(objectFactory, "Must have an object factory!");
+        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactory.getClass(), properties);
+        this.jaxbFactoryMap = JaxbUtil.getFactoryMethodMap(objectFactory.getClass());
+    }
+
+    /**
+     * Creates and stores a JAXBContext.
+     *
+     * @param objectFactory the object factory generated with xjc.
+     *
+     * @throws JAXBException if any problems arise creating the JAXBContext.
+     */
+    public JaxbSerialization(final Object objectFactory) throws JAXBException {
+        this.objectFactory = IntegrityUtil.ensure(objectFactory, "Must have an object factory!");
+        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactory.getClass());
+        this.jaxbFactoryMap = JaxbUtil.getFactoryMethodMap(objectFactory.getClass());
+    }
 
     /**
      * Creates and stores a JAXBContext.
@@ -52,7 +91,7 @@ public class JaxbSerialization {
      * @throws JAXBException if any problems arise creating the JAXBContext.
      */
     public JaxbSerialization(final Class objectFactoryClass, final Map properties) throws JAXBException {
-        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactoryClass, properties);
+        this(JaxbUtil.createObjectFactory(objectFactoryClass), properties);
     }
 
     /**
@@ -63,7 +102,16 @@ public class JaxbSerialization {
      * @throws JAXBException if any problems arise creating the JAXBContext.
      */
     public JaxbSerialization(final Class objectFactoryClass) throws JAXBException {
-        this.jaxbContext = JaxbUtil.createJaxbContext(objectFactoryClass);
+        this(JaxbUtil.createObjectFactory(objectFactoryClass));
+    }
+
+    /**
+     * Return the object factory.
+     *
+     * @return the object factory.
+     */
+    public Object getObjectFactory() {
+        return objectFactory;
     }
 
     /**
@@ -73,6 +121,15 @@ public class JaxbSerialization {
      */
     public JAXBContext getJaxbContext() {
         return jaxbContext;
+    }
+
+    /**
+     * Return the map that can be used to create JAXBElements.
+     *
+     * @return the map that can be used to create JAXBElements.
+     */
+    public Map<Class, Method> getJaxbFactoryMap() {
+        return jaxbFactoryMap;
     }
 
     /**
@@ -213,7 +270,7 @@ public class JaxbSerialization {
      * Marshal to a file. If isFormatted is true, the XML will be marshalled formatted.
      */
     public void marshal(final Object object, final File file, final boolean isFormatted) throws JAXBException {
-        createMarshaller(isFormatted).marshal(object, file);
+        marshal(JaxbUtil.createJaxbElement(getObjectFactory(), getJaxbFactoryMap(), object), file, isFormatted);
     }
 
     /**
@@ -227,7 +284,7 @@ public class JaxbSerialization {
      * Marshal to an output stream. If isFormatted is true, the XML will be marshalled formatted.
      */
     public void marshal(final Object object, final OutputStream outputStream, final boolean isFormatted) throws JAXBException {
-        createMarshaller(isFormatted).marshal(object, outputStream);
+        marshal(JaxbUtil.createJaxbElement(getObjectFactory(), getJaxbFactoryMap(), object), outputStream, isFormatted);
     }
 
     /**
@@ -241,7 +298,7 @@ public class JaxbSerialization {
      * Marshal to a writer in formatted XML. If isFormatted is true, the XML will be marshalled formatted.
      */
     public void marshal(final Object object, final Writer writer, final boolean isFormatted) throws JAXBException {
-        createMarshaller(isFormatted).marshal(object, writer);
+        marshal(JaxbUtil.createJaxbElement(getObjectFactory(), getJaxbFactoryMap(), object), writer, isFormatted);
     }
 
     /**

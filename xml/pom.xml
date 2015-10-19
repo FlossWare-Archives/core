@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.flossware</groupId>
         <artifactId>flossware-parent</artifactId>
-        <version>2.1.10</version>
+        <version>2.1.11</version>
     </parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -72,6 +72,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>collections</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>reflect-klass</artifactId>
             <version>${project.version}</version>
         </dependency>
 

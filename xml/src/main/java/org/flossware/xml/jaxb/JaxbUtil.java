@@ -16,13 +16,20 @@
  */
 package org.flossware.xml.jaxb;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
+import javax.xml.bind.annotation.XmlElementDecl;
 import org.flossware.common.IntegrityUtil;
+import org.flossware.reflect.klass.filter.annotation.MethodAnnotationFilter;
+import org.flossware.util.CollectionUtil;
 import org.flossware.util.ObjectUtil;
 
 /**
@@ -31,6 +38,77 @@ import org.flossware.util.ObjectUtil;
  * @author Scot P. Floess
  */
 public class JaxbUtil {
+
+    /**
+     * Return object factory methods
+     *
+     * @param objectFactoryClass the object factory class.
+     *
+     * @return all the methods that support creating JAXBElements.
+     */
+    public static Collection<Method> getFactoryMethods(final Class objectFactoryClass) {
+        IntegrityUtil.ensure(objectFactoryClass, "Must have an object factory class");
+
+        return CollectionUtil.filter(objectFactoryClass.getDeclaredMethods(), new MethodAnnotationFilter(), XmlElementDecl.class);
+    }
+
+    /**
+     * Return a map for object factory methods to create JAXBElements.
+     *
+     * @param objectFactoryClass
+     *
+     * @return a map of methods that can create JAXBElements.
+     */
+    public static Map<Class, Method> getFactoryMethodMap(final Class objectFactoryClass) {
+        IntegrityUtil.ensure(objectFactoryClass, "Must present a class!");
+
+        final Map<Class, Method> retVal = new HashMap<>();
+
+        for (final Method method : getFactoryMethods(objectFactoryClass)) {
+            retVal.put(method.getParameterTypes()[0], method);
+        }
+
+        return Collections.unmodifiableMap(retVal);
+    }
+
+    /**
+     * Using klass create a new object factory.
+     *
+     * @param klass the class to create an object factory.
+     *
+     * @return new object factory.
+     *
+     * @throws JAXBException if any problems arise creating the object factory.
+     */
+    public static Object createObjectFactory(final Class klass) throws JAXBException {
+        IntegrityUtil.ensure(klass, "Must present a class!");
+
+        try {
+            return klass.newInstance();
+        } catch (final Exception e) {
+            throw new JAXBException(e);
+        }
+    }
+
+    /**
+     * Attempts to create a JAXBElement.
+     *
+     * @param objectFactory
+     * @param jaxbFactoryMap
+     * @param object
+     * @return
+     * @throws JAXBException
+     */
+    public static JAXBElement createJaxbElement(final Object objectFactory, final Map<Class, Method> jaxbFactoryMap, final Object object) throws JAXBException {
+        IntegrityUtil.ensure(jaxbFactoryMap, 1);
+        IntegrityUtil.ensure(object, "Must have an object for JAXB!");
+
+        try {
+            return (JAXBElement) jaxbFactoryMap.get(object.getClass()).invoke(objectFactory, new Object[]{object});
+        } catch (final Exception e) {
+            throw new JAXBException(e);
+        }
+    }
 
     /**
      * Create a new JAXB context.

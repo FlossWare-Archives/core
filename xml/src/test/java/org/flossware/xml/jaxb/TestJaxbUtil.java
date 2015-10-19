@@ -16,13 +16,19 @@
  */
 package org.flossware.xml.jaxb;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+import org.flossware.core.xml.NameType;
 import org.flossware.core.xml.ObjectFactory;
+import org.flossware.core.xml.PersonType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +44,71 @@ public class TestJaxbUtil {
 
     private static final QName TEST_QNAME = new QName("foo");
     private static final Class<StubClass> STUB_CLASS = StubClass.class;
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_getFactoryMethods_null() throws JAXBException {
+        JaxbUtil.getFactoryMethods(null);
+    }
+
+    @Test
+    public void test_getFactoryMethods() throws JAXBException {
+        final Collection<Method> methods = JaxbUtil.getFactoryMethods(ObjectFactory.class);
+
+        Assert.assertFalse("Should have methods", methods.isEmpty());
+
+        final Collection<Method> missingMethods = new ArrayList<>();
+
+        for (final Method method : methods) {
+            if (!"createName".equals(method.getName()) && !"createPerson".equals(method.getName())) {
+                missingMethods.add(method);
+            }
+        }
+
+        Assert.assertTrue("Should be no missing methods", missingMethods.isEmpty());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_getFactoryMethodMap_null() throws JAXBException {
+        JaxbUtil.getFactoryMethodMap(null);
+    }
+
+    @Test
+    public void test_getFactoryMethodMap() throws JAXBException {
+        final Map<Class, Method> methodMap = JaxbUtil.getFactoryMethodMap(ObjectFactory.class);
+
+        Assert.assertEquals("Should be two methods", 2, methodMap.size());
+        Assert.assertTrue("Should have found method", methodMap.keySet().contains(NameType.class));
+        Assert.assertTrue("Should have found method", methodMap.keySet().contains(PersonType.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_createObjectFactory_null() throws JAXBException {
+        JaxbUtil.createObjectFactory(null);
+    }
+
+    @Test
+    public void test_createObjectFactory() throws JAXBException {
+        Assert.assertNotNull("Should have created an object factory", JaxbUtil.createObjectFactory(ObjectFactory.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_createJaxbElement_Null_Map() throws JAXBException {
+        JaxbUtil.createJaxbElement(this, null, this);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_createJaxbElement_Empty_Map() throws JAXBException {
+        JaxbUtil.createJaxbElement(this, Collections.EMPTY_MAP, this);
+    }
+
+    @Test
+    public void test_createJaxbElement() throws JAXBException {
+        final PersonType pt = new PersonType();
+        final JAXBElement element = JaxbUtil.createJaxbElement(new ObjectFactory(), JaxbUtil.getFactoryMethodMap(ObjectFactory.class), pt);
+
+        Assert.assertNotNull("Should have created the element", element);
+        Assert.assertEquals("Should be the same type", pt, element.getValue());
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_createJaxbContext_Class_Map_null() throws JAXBException {

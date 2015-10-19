@@ -50,8 +50,21 @@ public class TestJaxbSerialization {
     }
 
     @Test
+    public void test_constructor_object() throws JAXBException {
+        Assert.assertNotNull("Should have an object factory", new JaxbSerialization(new ObjectFactory()).getObjectFactory());
+
+        final ObjectFactory factory = new ObjectFactory();
+
+        Assert.assertSame("Should have an object factory", factory, new JaxbSerialization(factory).getObjectFactory());
+        Assert.assertNotNull("Should have a JAXBContext", new JaxbSerialization(new ObjectFactory()).getJaxbContext());
+        Assert.assertFalse("Should have factory methods", new JaxbSerialization(new ObjectFactory()).getJaxbFactoryMap().isEmpty());
+    }
+
+    @Test
     public void test_constructor_class() throws JAXBException {
+        Assert.assertNotNull("Should have an object factory", new JaxbSerialization(ObjectFactory.class).getObjectFactory());
         Assert.assertNotNull("Should have a JAXBContext", new JaxbSerialization(ObjectFactory.class).getJaxbContext());
+        Assert.assertFalse("Should have factory methods", new JaxbSerialization(ObjectFactory.class).getJaxbFactoryMap().isEmpty());
     }
 
     @Test
@@ -77,7 +90,7 @@ public class TestJaxbSerialization {
     }
 
     @Test
-    public void test_marshall_unmarshall() throws JAXBException {
+    public void test_marshall_unmarshall_JAXBElement() throws JAXBException {
         final NameType name = new NameType();
         name.setFirst(System.currentTimeMillis() + "first");
         name.setLast("last" + System.currentTimeMillis());
@@ -92,6 +105,36 @@ public class TestJaxbSerialization {
         final JaxbSerialization jaxbSerialization = new JaxbSerialization(ObjectFactory.class);
         final ObjectFactory factory = new ObjectFactory();
         jaxbSerialization.marshal(factory.createPerson(person), baos);
+
+        final byte[] marshalledPerson = baos.toByteArray();
+        Assert.assertNotEquals("Should have data", 0, marshalledPerson.length);
+
+        final ByteArrayInputStream bais = new ByteArrayInputStream(marshalledPerson);
+
+        final PersonType comparePerson = jaxbSerialization.unmarshal(bais);
+
+        Assert.assertEquals("Should have same id", person.getId(), comparePerson.getId());
+        Assert.assertEquals("Should have same age", person.getAge(), comparePerson.getAge());
+        Assert.assertEquals("Should have same first name", person.getName().getFirst(), comparePerson.getName().getFirst());
+        Assert.assertEquals("Should have same last name", person.getName().getLast(), comparePerson.getName().getLast());
+    }
+
+    @Test
+    public void test_marshall_unmarshall_Object() throws JAXBException {
+        final NameType name = new NameType();
+        name.setFirst(System.currentTimeMillis() + "first");
+        name.setLast("last" + System.currentTimeMillis());
+
+        final PersonType person = new PersonType();
+        person.setId(Long.MIN_VALUE);
+        person.setAge(Integer.SIZE);
+        person.setName(name);
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        final JaxbSerialization jaxbSerialization = new JaxbSerialization(ObjectFactory.class);
+
+        jaxbSerialization.marshal(person, baos);
 
         final byte[] marshalledPerson = baos.toByteArray();
         Assert.assertNotEquals("Should have data", 0, marshalledPerson.length);
