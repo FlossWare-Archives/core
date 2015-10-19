@@ -51,8 +51,8 @@
 		<module>common</module>
 		<module>patterns</module>
         <module>collections</module>
-        <module>reflect</module>
 		<module>utils</module>
+        <module>reflect</module>
 		<module>wsutils</module>
 	</modules>
 

@@ -17,15 +17,16 @@
 package org.flossware.collections.collection;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Represents a "functional" set which allows us to extend the core functions with values that return self so we can chain calls.
  * Similar to what one can do with StringBuilder. For example: functionalCollection.add("X").add("Y")
  *
  * @author sfloess
+ *
+ * @param <V> the type of value found in a collection.
  */
-public interface FunctionalCollection<V> extends Set<V> {
+public interface FunctionalCollection<V> extends Collection<V> {
 
     /**
      * Adds the specified value to this set if it is not already present.

@@ -27,8 +27,17 @@
     </developers>
 
     <modules>
+        <module>klass</module>
         <module>annotation</module>
         <module>call</module>
         <module>caller</module>
     </modules>
+
+	<dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
