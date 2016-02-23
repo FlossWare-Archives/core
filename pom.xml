@@ -84,9 +84,9 @@
 
     <distributionManagement>
         <repository>
-            <id>bintray-flossware-maven-core</id>
+            <id>bintray-flossware-maven</id>
             <name>flossware-maven-core</name>
-            <url>https://api.bintray.com/maven/flossware/maven/core</url>
+            <url>https://api.bintray.com/maven/flossware/maven/core/;publish=1</url>
         </repository>
     </distributionManagement>
 </project>
